@@ -74,8 +74,8 @@ df = load_dataset()
 
 def check_df(dataframe, head=10):
     """
-    Veri setindeki gözlem birimi, boyut bilgisi, değişken isimleri
-    gibi veri seti hakkındaki genel resmi verir.
+    Veri setinin temel istatistiksel bilgilerini ve yapısal özellikleri
+    hakkında bilgilendirme sağlar.
 
     Parameters
     ----------
