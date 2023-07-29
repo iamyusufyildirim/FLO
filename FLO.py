@@ -35,9 +35,10 @@
 # 1. İş Problemi - (Business Problem)
 # 2. Veriyi Anlama - (Data Understanding)
 # 3. Veriyi Hazırlama - (Data Preparation)
-# 4. RFM Metriklerinin Oluşturulması - (Calculating RFM Metrics)
-# 5. RFM Skorlarının Oluşturulması - (Calculating RFM Scores)
-# 6. RFM Segmentlerinin Oluşturulması ve Analiz Edilmesi - (Creating & Analysing RFM Segments)
+# 4. RFM Veri Yapısının Hazırlanması - (Preparation of RFM Data Structere)
+# 5. RFM Metriklerinin Oluşturulması - (Calculating RFM Metrics)
+# 6. RFM Skorlarının Oluşturulması - (Calculating RFM Scores)
+# 7. RFM Segmentlerinin Oluşturulması ve Analiz Edilmesi - (Creating & Analysing RFM Segments)
 """
 
 
