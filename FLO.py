@@ -17,29 +17,30 @@
 #    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-#    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#    +                                                          UYGULAMA SONRASI                                                                                 +
-#    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#    +                                                                                                                                                           +
-#    +                            master_id            Recency  Frequency  Monetary Recency_Score Frequency_Score Monetary_Score RF_Score              SEGMENT   +
-#    +    0      00016786-2f5a-11ea-bb80-000d3a38a36f       10       5.00    776.07             5               4              4       54            champions   +
-#    +    1      00034aaa-a838-11e9-a2fc-000d3a38a36f      298       3.00    269.47             1               2              1       12          hibernating   +
-#    +    2      000be838-85df-11ea-a90b-000d3a38a36f      213       4.00    722.69             2               3              4       23              at_Risk   +
-#    +    3      000c1fe2-a8b7-11ea-8479-000d3a38a36f       27       7.00    874.16             5               4              4       54            champions   +
-#    +    4      000f5e3e-9dde-11ea-80cd-000d3a38a36f       20       7.00   1620.33             5               4              5       54            champions   +
-#    +                                                                                                                                                           +
-#    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    +                                                               UYGULAMA SONRASI                                                                                      +
+#    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#    +                                                                                                                                                                     +
+#    +                                    Customer_ID  Recency  Frequency  Monetary Recency_Score Frequency_Score Monetary_Score RF_Score RFM_Score              SEGMENT   +
+#    +    0      5d1c466a-9cfd-11e9-9897-000d3a38a36f       32     202.00  45905.10             5               5              5       55       555            champions   +
+#    +    1      d5ef8058-a5c6-11e9-a2fc-000d3a38a36f       98      68.00  36818.29             3               5              5       35       355      loyal_customers   +
+#    +    2      73fd19aa-9e37-11e9-9897-000d3a38a36f       14      82.00  33918.10             5               5              5       55       555            champions   +
+#    +    3      7137a5c0-7aad-11ea-8f20-000d3a38a36f       49      11.00  31227.41             4               5              5       45       455      loyal_customers   +
+#    +    4      47a642fe-975b-11eb-8c2a-000d3a38a36f       35       4.00  20706.34             4               3              5       43       435  potential_loyalists   +
+#    +                                                                                                                                                                     +
+#    +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 """
-# 1. İş Problemi - (Business Problem)
-# 2. Veriyi Anlama - (Data Understanding)
-# 3. Veriyi Hazırlama - (Data Preparation)
-# 4. RFM Veri Yapısının Hazırlanması - (Preparation of RFM Data Structere)
-# 5. RFM Metriklerinin Oluşturulması - (Calculating RFM Metrics)
-# 6. RFM Skorlarının Oluşturulması - (Calculating RFM Scores)
-# 7. RFM Segmentlerinin Oluşturulması ve Analiz Edilmesi - (Creating & Analysing RFM Segments)
+# 1. Business Problem
+# 2. Data Understanding
+# 3. Data Preparation
+# 4. Preparation of RFM Data Structure
+# 5. Calculating RFM Metrics
+# 6. Calculating RFM Scores
+# 7. Creating & Analysing RFM Segments
 """
+
 
 
 # ---------------------------------------
@@ -202,10 +203,9 @@ grab_col_names(dataframe=df)
 # - 3. Veriyi Hazırlama - (Data Preparation) -
 # --------------------------------------------
 
-# Tarih ifade eden değişkenlerin tipini date'e çevirdik.
-for col in df.columns:
-    if "date" in col:
-        df[col] = df[col].astype("datetime64[ns]")
+# Tarih ifade eden değişkenlerin tipini date'e çeviriniz.
+date_columns = df.columns[df.columns.str.contains("date")]
+df[date_columns] = df[date_columns].apply(pd.to_datetime)
 
 
 # Omnichannel müşterilerin hem online'dan hemde offline platformlardan alışveriş yaptığını ifade etmektedir.
@@ -233,19 +233,17 @@ today_date = dt.datetime(2021, 6, 1)
 
 rfm = df.groupby("master_id").agg({"last_order_date" : lambda date : (today_date - date.max()).days,
                                    "total_order_num" : lambda total_order_num : total_order_num.sum(),
-                                   "total_price" : lambda total_price : total_price.sum(),
-                                   "interested_in_categories_12" : lambda category : category  # PowerBI ile raporlama işlemi için category değişkeninide dahil ettim.
-                                   }).sort_values(by="total_price", ascending=False)
+                                   "total_price" : lambda total_price : total_price.sum()}).sort_values(by="total_price", ascending=False)
 
 
-rfm.columns = ["Recency", "Frequency", "Monetary", "Category"]
+rfm.columns = ["Recency", "Frequency", "Monetary"]
 
 
 rfm.reset_index(inplace=True)
 
 
 # master_id değişken ismini customer_id ismiyle güncelliyoruz.
-rfm = rfm.rename(columns={'master_id': 'customer_id'})
+rfm = rfm.rename(columns={'master_id': 'Customer_ID'})
 
 
 
